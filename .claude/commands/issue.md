@@ -315,16 +315,29 @@ A comprehensive command that prepares your environment and provides full context
 
 #### Without Issue Number (`/issue work`)
 
-When called without an issue number, performs intelligent issue selection:
+When called without an issue number, performs intelligent issue selection. You can optionally specify how much time you have available:
+
+```bash
+/issue work              # No time specified, asks for time availability
+/issue work 30min        # Suggests issues that can be done in 30 minutes
+/issue work 2h           # Suggests issues for 2 hour work session
+/issue work 1 day        # Suggests issues for full day of work
+/issue work "quick fix"  # Suggests small, quick issues
+/issue work "few hours"  # Suggests medium-sized issues
+```
 
 1. **Automated Analysis**:
    - Reviews all open GitHub issues
    - Analyzes codebase for context
    - Considers issue priority, complexity, and dependencies
+   - **Prioritizes urgent issues (security vulnerabilities) regardless of time**
+   - Matches issue effort to available time (if specified)
    - Suggests the most appropriate issue to work on
 
 2. **Selection Criteria**:
+   - **Security vulnerabilities always shown first (CRITICAL)**
    - Prioritizes bugs over enhancements
+   - Matches estimated effort to available time
    - Considers issues with clear requirements
    - Avoids blocked or dependent issues
    - Balances impact vs. effort
@@ -332,35 +345,47 @@ When called without an issue number, performs intelligent issue selection:
 
 3. **Example Workflow**:
    ```bash
-   /issue work
+   /issue work 1h
    
    # Claude performs:
    # 1. 📋 Reviewing 23 open issues...
-   # 2. 🔍 Analyzing codebase context...
-   # 3. 🎯 Recommendation:
+   # 2. ⏱️ Time available: 1 hour
+   # 3. 🔍 Analyzing codebase context...
+   # 4. 🎯 Recommendations:
    #
-   # Based on my analysis, I recommend working on:
+   # 🚨 URGENT - Security Issue Found:
+   #
+   # Issue #52: SQL Injection vulnerability in search endpoint
+   # - Type: Security Bug (CRITICAL)
+   # - Effort: 45 minutes
+   # - Impact: CRITICAL - exposes database to attacks
+   # - Must be fixed immediately
+   #
+   # Other issues matching your time (1 hour):
    #
    # Issue #43: Toast notifications not implemented
    # - Type: Bug (High Priority)
-   # - Effort: Small (2-3 hours)
+   # - Effort: 30-45 minutes
    # - Impact: High - affects all user interactions
    # - No blockers or dependencies
    #
-   # Why this issue:
-   # - Quick win with high user impact
-   # - Clear implementation path
-   # - Improves UX significantly
-   # - Good starting point if new to codebase
+   # Issue #47: File validation missing
+   # - Type: Bug (Medium Priority)
+   # - Effort: 45-60 minutes
+   # - Impact: Medium - potential data issues
    #
-   # Alternative suggestions:
-   # - #44: React Error Boundaries (Medium effort, High impact)
-   # - #47: File validation (Small effort, Medium impact)
-   #
-   # Would you like to work on issue #43? [yes/no]
+   # ⚠️ STRONGLY RECOMMEND fixing security issue #52 first
+   # Would you like to work on issue #52? [yes/no]
    ```
 
-4. **After Acceptance**:
+4. **Time Estimation Guide**:
+   - **15-30 minutes**: Typos, config changes, small CSS fixes
+   - **30min-1h**: Simple bugs, minor features, documentation
+   - **1-3 hours**: Standard bugs, small features, refactoring
+   - **3-6 hours**: Complex features, major bugs, integrations
+   - **1+ days**: Architecture changes, new systems, major features
+
+5. **After Acceptance**:
    - Automatically runs `/issue work 43`
    - Sets up branch and provides full context
    - Shows implementation guidance
